@@ -1,1 +1,282 @@
-# kedai-kopi-juannimangsape-
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kedai Kopi & Burger - Pesan Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --mustard:#F2B91F;
+    --ink:#2A1B12;
+    --ketchup:#D2362B;
+    --bun:#FFF9E8;
+    --leaf:#2F7D4F;
+    --line:#2A1B12;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Figtree',system-ui,sans-serif;color:var(--ink);background:var(--bun);padding-bottom:110px;line-height:1.4}
+  h1,h2,h3{font-family:'Bricolage Grotesque','Figtree',sans-serif;line-height:1.05}
+  button{font-family:inherit;cursor:pointer}
+  :focus-visible{outline:3px solid var(--ketchup);outline-offset:2px}
+
+  /* Hero */
+  header{background:var(--mustard);border-bottom:3px solid var(--line);padding:36px 20px 28px}
+  .wrap{max-width:720px;margin:0 auto}
+  header h1{font-size:clamp(38px,11vw,64px);font-weight:800;letter-spacing:-.02em}
+  header p{margin-top:12px;font-size:17px;max-width:30ch}
+  .hours{display:inline-block;margin-top:18px;background:var(--ink);color:var(--mustard);padding:8px 14px;border-radius:999px;font-weight:700;font-size:14px}
+
+  /* Tabs */
+  nav{position:sticky;top:0;z-index:5;background:var(--bun);border-bottom:2px solid var(--line);overflow-x:auto;white-space:nowrap;padding:10px 20px;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav button{border:2px solid var(--line);background:transparent;padding:8px 16px;border-radius:999px;font-weight:700;font-size:15px;margin-right:8px;color:var(--ink)}
+  nav button.on{background:var(--ink);color:var(--bun)}
+
+  main{padding:8px 20px}
+  section h2{font-size:28px;font-weight:800;margin:26px 0 12px}
+  .item{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1.5px dashed rgba(42,27,18,.35)}
+  .item .info{flex:1;min-width:0}
+  .item h3{font-size:19px;font-weight:600}
+  .item .desc{font-size:14px;opacity:.75;margin-top:3px}
+  .item .price{font-weight:700;margin-top:6px;color:var(--ketchup)}
+  .badge{display:inline-block;font-size:12px;font-weight:700;background:var(--leaf);color:#fff;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
+
+  .add{border:2.5px solid var(--line);background:var(--mustard);font-weight:800;font-size:15px;padding:10px 18px;border-radius:12px;box-shadow:3px 3px 0 var(--line);transition:transform .08s,box-shadow .08s}
+  .add:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--line)}
+  .qty{display:flex;align-items:center;gap:0;border:2.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .qty button{width:40px;height:40px;border:none;background:transparent;font-size:22px;font-weight:800;color:var(--ink)}
+  .qty button:active{background:var(--mustard)}
+  .qty span{min-width:30px;text-align:center;font-weight:800}
+
+  /* Cart bar */
+  #bar{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--ink);display:none}
+  #bar.show{display:block}
+  #bar button{width:100%;max-width:720px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;border:none;background:var(--mustard);color:var(--ink);font-weight:800;font-size:17px;padding:15px 18px;border-radius:14px}
+
+  /* Checkout sheet */
+  #sheet{position:fixed;inset:0;z-index:20;background:rgba(42,27,18,.6);display:none;align-items:flex-end;justify-content:center}
+  #sheet.show{display:flex}
+  .panel{background:var(--bun);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));border-top:3px solid var(--line)}
+  .panel h2{font-size:26px;font-weight:800;margin-bottom:6px}
+  .row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1.5px dashed rgba(42,27,18,.3);font-size:15px}
+  .total{display:flex;justify-content:space-between;font-weight:800;font-size:20px;padding:14px 0}
+  label{display:block;font-weight:700;font-size:14px;margin:12px 0 5px}
+  input,textarea,select{width:100%;padding:12px;border:2.5px solid var(--line);border-radius:12px;font:inherit;background:#fff;color:var(--ink)}
+  textarea{resize:vertical;min-height:64px}
+  .types{display:flex;gap:8px;flex-wrap:wrap}
+  .types label{margin:0;flex:1;min-width:100px}
+  .types input{display:none}
+  .types span{display:block;text-align:center;padding:11px 6px;border:2.5px solid var(--line);border-radius:12px;font-weight:700;background:#fff}
+  .types input:checked + span{background:var(--ink);color:var(--mustard)}
+  .go{margin-top:18px;width:100%;border:3px solid var(--line);background:var(--leaf);color:#fff;font-weight:800;font-size:18px;padding:16px;border-radius:14px;box-shadow:4px 4px 0 var(--line)}
+  .go small{display:block;font-weight:500;font-size:13px;opacity:.9;margin-top:2px}
+  .back{display:block;margin:14px auto 0;background:none;border:none;font-weight:700;text-decoration:underline;color:var(--ink);font-size:15px}
+  .alt{display:block;text-align:center;margin-top:14px;font-size:14px;color:var(--ink)}
+  .err{color:var(--ketchup);font-weight:700;font-size:14px;margin-top:8px;display:none}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Kedai Kopi &amp; Burger</h1>
+    <p>Pilih menu, tekan tombol, pesanan langsung masuk ke WhatsApp kami.</p>
+    <span class="hours">Buka setiap hari</span>
+  </div>
+</header>
+
+<nav id="tabs"></nav>
+<main class="wrap" id="menu"></main>
+
+<div id="bar"><button id="openCart"><span id="barCount">0 item</span><span id="barTotal">Rp0</span></button></div>
+
+<div id="sheet" role="dialog" aria-modal="true" aria-label="Pesanan kamu">
+  <div class="panel">
+    <h2>Pesanan kamu</h2>
+    <div id="lines"></div>
+    <div class="total"><span>Total</span><span id="grand">Rp0</span></div>
+
+    <label for="nama">Nama</label>
+    <input id="nama" placeholder="Nama kamu" autocomplete="name">
+
+    <label>Cara ambil</label>
+    <div class="types">
+      <label><input type="radio" name="tipe" value="Makan di tempat" checked><span>Makan di tempat</span></label>
+      <label><input type="radio" name="tipe" value="Ambil sendiri"><span>Ambil sendiri</span></label>
+      <label><input type="radio" name="tipe" value="Antar ke alamat"><span>Antar</span></label>
+    </div>
+
+    <div id="extraWrap">
+      <label for="extra" id="extraLabel">Nomor meja</label>
+      <input id="extra" placeholder="Contoh: Meja 5">
+    </div>
+
+    <label for="catatan">Catatan (opsional)</label>
+    <textarea id="catatan" placeholder="Contoh: kopi kurang manis, burger tanpa bawang"></textarea>
+
+    <p class="err" id="err"></p>
+
+    <button class="go" id="send">Masuk ke Kontak<small>Pesanan terkirim otomatis ke WhatsApp admin</small></button>
+    <button class="back" id="close">Kembali ke menu</button>
+    <a class="alt" id="altLink" href="https://wa.me/qr/SVDWDRYS2M7YA1" target="_blank" rel="noopener">Atau chat admin langsung tanpa memilih menu</a>
+  </div>
+</div>
+
+<script>
+/* ====== PENGATURAN (ubah di sini) ====== */
+const NOMOR_ADMIN = "6283878822851";          // 083878822851 -> format internasional
+const NAMA_KEDAI  = "Kedai Kopi & Burger";    // ganti dengan nama kedai kamu
+
+/* Daftar menu & harga: edit sesuka kamu */
+const MENU = [
+  { kategori: "Kopi", items: [
+    { id:"k1", nama:"Kopi Hitam",        desc:"Seduh manual, pahit mantap",           harga:10000 },
+    { id:"k2", nama:"Kopi Susu",         desc:"Espresso, susu segar, gula aren",      harga:15000, laris:true },
+    { id:"k3", nama:"Americano",         desc:"Espresso dengan air panas/es",         harga:15000 },
+    { id:"k4", nama:"Latte",             desc:"Espresso dan susu lembut",             harga:18000 },
+    { id:"k5", nama:"Cappuccino",        desc:"Espresso, susu, busa tebal",           harga:18000 },
+    { id:"k6", nama:"Kopi Caramel",      desc:"Kopi susu dengan saus karamel",        harga:20000 },
+  ]},
+  { kategori: "Burger", items: [
+    { id:"b1", nama:"Burger Ayam",       desc:"Ayam crispy, selada, tomat, saus",     harga:20000 },
+    { id:"b2", nama:"Burger Sapi",       desc:"Patty sapi, keju, selada, bawang",     harga:25000, laris:true },
+    { id:"b3", nama:"Burger Double",     desc:"Dua patty sapi, dua keju, saus spesial", harga:35000 },
+    { id:"b4", nama:"Burger Telur",      desc:"Patty sapi dan telur mata sapi",       harga:28000 },
+  ]},
+  { kategori: "Camilan", items: [
+    { id:"c1", nama:"Kentang Goreng",    desc:"Porsi besar, bumbu gurih",             harga:12000 },
+    { id:"c2", nama:"Nugget Ayam",       desc:"6 potong dengan saus",                 harga:15000 },
+    { id:"c3", nama:"Roti Bakar",        desc:"Cokelat keju atau selai",              harga:13000 },
+  ]},
+  { kategori: "Minuman Lain", items: [
+    { id:"m1", nama:"Es Teh Manis",      desc:"Segar dan dingin",                     harga:5000 },
+    { id:"m2", nama:"Cokelat Dingin",    desc:"Cokelat pekat dengan susu",            harga:16000 },
+    { id:"m3", nama:"Air Mineral",       desc:"Botol 600 ml",                         harga:4000 },
+  ]},
+];
+/* ======================================= */
+
+const rp = n => "Rp" + n.toLocaleString("id-ID");
+const cart = {};               // id -> qty
+const flat = MENU.flatMap(c => c.items);
+const find = id => flat.find(i => i.id === id);
+const $ = s => document.querySelector(s);
+
+document.title = NAMA_KEDAI + " - Pesan Online";
+document.querySelector("header h1").textContent = NAMA_KEDAI;
+
+/* Render menu */
+const menuEl = $("#menu"), tabsEl = $("#tabs");
+MENU.forEach((c, i) => {
+  const b = document.createElement("button");
+  b.textContent = c.kategori;
+  b.onclick = () => document.getElementById("sec" + i).scrollIntoView({behavior:"smooth", block:"start"});
+  tabsEl.appendChild(b);
+
+  const s = document.createElement("section");
+  s.id = "sec" + i;
+  s.style.scrollMarginTop = "60px";
+  s.innerHTML = `<h2>${c.kategori}</h2>` + c.items.map(it => `
+    <div class="item">
+      <div class="info">
+        <h3>${it.nama}${it.laris ? '<span class="badge">Paling laris</span>' : ''}</h3>
+        <p class="desc">${it.desc}</p>
+        <p class="price">${rp(it.harga)}</p>
+      </div>
+      <div class="ctl" data-id="${it.id}"></div>
+    </div>`).join("");
+  menuEl.appendChild(s);
+});
+
+function drawControls(){
+  document.querySelectorAll(".ctl").forEach(el => {
+    const id = el.dataset.id, q = cart[id] || 0;
+    el.innerHTML = q
+      ? `<div class="qty"><button aria-label="Kurangi" data-a="-">&minus;</button><span>${q}</span><button aria-label="Tambah" data-a="+">+</button></div>`
+      : `<button class="add" data-a="+">Tambah</button>`;
+  });
+}
+menuEl.addEventListener("click", e => {
+  const a = e.target.closest("[data-a]"); if(!a) return;
+  change(a.closest(".ctl").dataset.id, a.dataset.a === "+" ? 1 : -1);
+});
+
+function change(id, d){
+  cart[id] = Math.max(0, (cart[id] || 0) + d);
+  if(!cart[id]) delete cart[id];
+  update();
+}
+function totals(){
+  let n = 0, t = 0;
+  for(const id in cart){ n += cart[id]; t += cart[id] * find(id).harga; }
+  return {n, t};
+}
+function update(){
+  drawControls();
+  const {n, t} = totals();
+  $("#bar").classList.toggle("show", n > 0);
+  $("#barCount").textContent = n + " item";
+  $("#barTotal").textContent = "Lihat pesanan  " + rp(t);
+  if($("#sheet").classList.contains("show")) drawLines();
+  if(!n) closeSheet();
+}
+
+/* Checkout */
+function drawLines(){
+  $("#lines").innerHTML = Object.keys(cart).map(id => {
+    const it = find(id);
+    return `<div class="row"><span>${cart[id]}x ${it.nama}</span><span>${rp(cart[id]*it.harga)}</span></div>`;
+  }).join("");
+  $("#grand").textContent = rp(totals().t);
+}
+function openSheet(){ drawLines(); $("#sheet").classList.add("show"); }
+function closeSheet(){ $("#sheet").classList.remove("show"); }
+$("#openCart").onclick = openSheet;
+$("#close").onclick = closeSheet;
+$("#sheet").addEventListener("click", e => { if(e.target.id === "sheet") closeSheet(); });
+
+document.querySelectorAll('input[name="tipe"]').forEach(r => r.addEventListener("change", () => {
+  const v = document.querySelector('input[name="tipe"]:checked').value;
+  const w = $("#extraWrap");
+  if(v === "Makan di tempat"){ w.style.display = ""; $("#extraLabel").textContent = "Nomor meja"; $("#extra").placeholder = "Contoh: Meja 5"; }
+  else if(v === "Antar ke alamat"){ w.style.display = ""; $("#extraLabel").textContent = "Alamat lengkap"; $("#extra").placeholder = "Jalan, nomor rumah, patokan"; }
+  else { w.style.display = "none"; }
+}));
+
+$("#send").onclick = () => {
+  const nama = $("#nama").value.trim();
+  const tipe = document.querySelector('input[name="tipe"]:checked').value;
+  const extra = $("#extra").value.trim();
+  const catatan = $("#catatan").value.trim();
+  const err = $("#err");
+
+  if(!nama){ err.textContent = "Isi nama kamu dulu."; err.style.display = "block"; $("#nama").focus(); return; }
+  if(tipe === "Antar ke alamat" && !extra){ err.textContent = "Isi alamat pengantaran."; err.style.display = "block"; $("#extra").focus(); return; }
+  err.style.display = "none";
+
+  const lines = Object.keys(cart).map((id, i) => {
+    const it = find(id);
+    return `${i+1}. ${it.nama} x${cart[id]} = ${rp(cart[id]*it.harga)}`;
+  }).join("\n");
+
+  let pesan = `*PESANAN BARU - ${NAMA_KEDAI}*\n\n`;
+  pesan += `Nama: ${nama}\n`;
+  pesan += `Cara ambil: ${tipe}\n`;
+  if(extra) pesan += (tipe === "Antar ke alamat" ? "Alamat: " : "Meja: ") + extra + "\n";
+  pesan += `\n*Menu dipesan:*\n${lines}\n\n*Total: ${rp(totals().t)}*`;
+  if(catatan) pesan += `\n\nCatatan: ${catatan}`;
+
+  window.open(`https://wa.me/${NOMOR_ADMIN}?text=${encodeURIComponent(pesan)}`, "_blank");
+};
+
+update();
+</script>
+</body>
+  </html>
+  
